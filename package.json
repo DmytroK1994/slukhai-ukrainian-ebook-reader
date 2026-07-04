@@ -3,7 +3,8 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "prepare:web": "mkdir -p dist && cp index.html styles.css updates.css app.js manifest.webmanifest icon.svg sw.js sw-v2.js dist/",
+    "postinstall": "node scripts/patch-ios-background-tts.mjs",
+    "prepare:web": "mkdir -p dist && cp index.html styles.css updates.css app.js manifest.webmanifest icon.svg sw.js sw-v2.js .nojekyll dist/",
     "native:sync": "npm run prepare:web && npx cap sync",
     "android": "npm run native:sync && npx cap open android",
     "ios": "npm run native:sync && npx cap open ios"
