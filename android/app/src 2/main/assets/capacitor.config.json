@@ -1,0 +1,14 @@
+{
+	"appId": "ua.slukhai.reader",
+	"appName": "Слухай",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"ios": {
+		"contentInset": "automatic"
+	},
+	"android": {
+		"allowMixedContent": false
+	}
+}
