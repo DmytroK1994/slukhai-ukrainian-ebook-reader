@@ -122,7 +122,7 @@ displayPage=function(direction=0){
     leaves.push(parts);
   }
   pageState.desktopStart=spreadStart;pageState.desktopEnd=cursor;pageState.desktopAdvance=Math.max(1,cursor-spreadStart);pageState.desktopHistory=pageState.desktopHistory||[];
-  const b=state.books[state.current],targetLanguage=$('#speechLanguage').value.split('-')[0];els.text.classList.add('two-page-spread');els.text.innerHTML=leaves.map((parts,index)=>`<div class="book-page filled-page" data-leaf="${index}">${parts.map(part=>{const shown=$('#showTranslation')?.checked?(b.translations?.[`${part.index}:${targetLanguage}`]||part.text):part.text;return`<p data-chunk="${part.index}">${escapeHtml(shown)}</p>`}).join('')}</div>`).join('');
+  const b=state.books[state.current],targetLanguage=$('#speechLanguage').value.split('-')[0],allParts=leaves.flat();els.text.classList.add('two-page-spread');els.text.innerHTML=`<div class="spread-flow">${allParts.map(part=>{const shown=$('#showTranslation')?.checked?(b.translations?.[`${part.index}:${targetLanguage}`]||part.text):part.text;return`<p data-chunk="${part.index}">${escapeHtml(shown)}</p>`}).join('')}</div>`;
   if($('#translateToggle').checked)translateVisibleSpread(leaves.flat(),b,targetLanguage);
   const chapter=[...(b.chapters||[])].reverse().find(x=>x.index<=state.index);els.meta.textContent=`${chapter?.title?chapter.title+' · ':''}${spreadStart+1}–${Math.min(state.chunks.length,cursor)}/${state.chunks.length}`;
   els.text.classList.remove('turn-forward','turn-back');void els.text.offsetWidth;if(direction)els.text.classList.add(direction>0?'turn-forward':'turn-back');
@@ -143,6 +143,8 @@ document.addEventListener('keydown',event=>{
   if(event.key==='ArrowLeft'||event.key==='PageUp'){event.preventDefault();turnPage(-1)}
   if(event.code==='Space'){event.preventDefault();els.play.click()}
 });
+els.text.addEventListener('click',event=>{if(window.getSelection()?.toString().trim()){event.stopImmediatePropagation()}},true);
+document.addEventListener('gesturestart',event=>event.preventDefault(),{passive:false});
 
 async function translateVisibleSpread(parts,book,target){book.translations=book.translations||{};for(const part of parts){const key=`${part.index}:${target}`;try{if(target==='uk'&&isProbablyUkrainian(part.text)){delete book.translations[key];continue}if(!book.translations[key])book.translations[key]=await googleTranslate(part.text,target);const node=els.text.querySelector(`[data-chunk="${part.index}"]`);if(node&&part.index!==state.index)node.textContent=book.translations[key]}catch(error){console.warn('Не вдалося перекласти видимий уривок',error)}}save()}
 
