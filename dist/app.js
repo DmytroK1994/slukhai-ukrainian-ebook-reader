@@ -144,7 +144,7 @@ document.addEventListener('keydown',event=>{
   if(event.code==='Space'){event.preventDefault();els.play.click()}
 });
 
-async function translateVisibleSpread(parts,book,target){book.translations=book.translations||{};for(const part of parts){const key=`${part.index}:${target}`;try{if(!book.translations[key])book.translations[key]=await googleTranslate(part.text,target);const node=els.text.querySelector(`[data-chunk="${part.index}"]`);if(node&&part.index!==state.index)node.textContent=book.translations[key]}catch(error){console.warn('Не вдалося перекласти видимий уривок',error)}}save()}
+async function translateVisibleSpread(parts,book,target){book.translations=book.translations||{};for(const part of parts){const key=`${part.index}:${target}`;try{if(target==='uk'&&isProbablyUkrainian(part.text)){delete book.translations[key];continue}if(!book.translations[key])book.translations[key]=await googleTranslate(part.text,target);const node=els.text.querySelector(`[data-chunk="${part.index}"]`);if(node&&part.index!==state.index)node.textContent=book.translations[key]}catch(error){console.warn('Не вдалося перекласти видимий уривок',error)}}save()}
 
 const OFFLINE_MODEL='Xenova/opus-mt-en-uk';let offlineTranslator=null,offlineLoading=null;
 const offlineStatus=$('#offlinePackStatus'),offlineButton=$('#downloadOfflinePack'),offlineToggle=$('#offlineTranslateToggle');
@@ -157,4 +157,13 @@ async function loadOfflineTranslator(showProgress=false){
 }
 offlineButton.onclick=async()=>{try{await loadOfflineTranslator(true);toast('Офлайн-пакет готовий')}catch(error){console.error(error);toast('Не вдалося завантажити мовний пакет')}};
 const onlineGoogleTranslate=googleTranslate;
-googleTranslate=async function(text,target){if(offlineToggle.checked&&target==='uk'){if(localStorage.getItem('offlineEnUkReady')!=='true'&&!navigator.onLine)throw Error('offline_pack_missing');const translator=await loadOfflineTranslator(false),parts=text.match(/[\s\S]{1,420}(?:\s|$)/g)||[text],translatedParts=[];for(const part of parts){const result=await translator(part,{max_new_tokens:512});translatedParts.push(result?.[0]?.translation_text||'')}return translatedParts.join(' ')}return onlineGoogleTranslate(text,target)};
+googleTranslate=async function(text,target){if(target==='uk'&&isProbablyUkrainian(text))return text;if(offlineToggle.checked&&target==='uk'){if(localStorage.getItem('offlineEnUkReady')!=='true'&&!navigator.onLine)throw Error('offline_pack_missing');const translator=await loadOfflineTranslator(false),parts=text.match(/[\s\S]{1,420}(?:\s|$)/g)||[text],translatedParts=[];for(const part of parts){const result=await translator(part,{max_new_tokens:512});translatedParts.push(result?.[0]?.translation_text||'')}return translatedParts.join(' ')}return onlineGoogleTranslate(text,target)};
+
+function isProbablyUkrainian(text){const letters=(text.match(/[а-яіїєґ]/gi)||[]).length;if(letters<8)return false;if(/[іїєґ]/i.test(text))return true;if(/[ыэъё]/i.test(text))return false;return /\b(та|що|це|для|коли|який|яка|було|його|вона|вони|мене|тебе|україн)/i.test(text)}
+translated=async function(text){
+  if(!$('#translateToggle').checked)return text;
+  const book=state.books[state.current],target=$('#speechLanguage').value.split('-')[0],key=`${state.index}:${target}`;book.translations=book.translations||{};
+  if(target==='uk'&&isProbablyUkrainian(text)){delete book.translations[key];return text}
+  if(book.translations[key])return book.translations[key];toast('Перекладаю мовою озвучення…');const endpoint=$('#translateEndpoint').value.trim();
+  try{let result;if(endpoint){const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:text,source:'auto',target,format:'text'})});if(!response.ok)throw Error();result=(await response.json()).translatedText}else result=await googleTranslate(text,target);book.translations[key]=result;save();return result}catch(error){toast(error?.message==='offline_pack_missing'?'Спочатку завантаж офлайн-пакет':'Не вдалося перекласти. Перевір з’єднання або сервіс.');throw Error('translation_failed')}
+};
