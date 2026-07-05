@@ -1,1 +1,11 @@
-capacitor.config 2.json
+node_modules/
+dist/
+.gems/
+.tools/
+vendor/
+.DS_Store
+android/.gradle/
+android/local.properties
+android/app/build/
+ios/App/Pods/
+ios/App/DerivedData/

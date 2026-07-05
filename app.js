@@ -53,3 +53,21 @@ $('#setCustomSleep').onclick=()=>{const minutes=Number($('#customSleepMinutes').
 const aboutDialog=$('#aboutDialog'),supportUrl=window.SLUKHAI_CONFIG?.supportUrl?.trim(),supportLabel=window.SLUKHAI_CONFIG?.supportLabel||'Підтримати проєкт';$('#aboutAppBtn').onclick=()=>{dialog.close();aboutDialog.showModal()};$('#closeAboutDialog').onclick=()=>aboutDialog.close();function openSupport(){if(supportUrl)window.open(supportUrl,'_blank','noopener,noreferrer')}for(const button of [$('#supportProject'),$('#supportFromAbout')]){if(supportUrl){button.hidden=false;button.textContent='♡ '+supportLabel;button.onclick=openSupport}}
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw-v2.js');loadLibrary();
 if('mediaSession'in navigator){navigator.mediaSession.setActionHandler('play',()=>state.paused?resumePlayback():els.play.click());navigator.mediaSession.setActionHandler('pause',()=>pausePlayback());navigator.mediaSession.setActionHandler('previoustrack',()=>skipFromMedia(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>skipFromMedia(1));navigator.mediaSession.setActionHandler('seekbackward',()=>skipFromMedia(-1));navigator.mediaSession.setActionHandler('seekforward',()=>skipFromMedia(1))}
+// Пошук у бібліотеці застосовується поверх активної категорії без зміни даних книжок.
+let librarySearchQuery='';
+const renderLibraryBase=renderLibrary;
+renderLibrary=function(){
+  renderLibraryBase();
+  const query=librarySearchQuery.trim().toLocaleLowerCase('uk');
+  let visible=0;
+  document.querySelectorAll('#bookGrid .book').forEach(card=>{
+    const matches=!query||(card.querySelector('h3')?.textContent||'').toLocaleLowerCase('uk').includes(query);
+    card.hidden=!matches;
+    if(matches)visible++;
+    const categoryButton=card.querySelector('.categorize-book');
+    if(categoryButton){categoryButton.textContent='🏷';categoryButton.title='Змінити категорію'}
+  });
+  els.count.textContent=`${visible} ${visible===1?'книжка':'книжок'}`;
+};
+$('#bookSearch')?.addEventListener('input',event=>{librarySearchQuery=event.target.value;renderLibrary()});
+renderLibrary();
