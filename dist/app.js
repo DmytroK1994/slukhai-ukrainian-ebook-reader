@@ -86,6 +86,7 @@ highlightWord=function(text,start,length){
     const pages=paginate(text);let offset=0,pageIndex=0;
     for(let i=0;i<pages.length;i++){const end=offset+pages[i].length;if(start<=end){pageIndex=i;break}offset=end+1}
     pageState.text=text;pageState.pages=pages;pageState.page=spreadSize()===2?Math.floor(pageIndex/2)*2:pageIndex;displayPage();
+    if(spreadSize()===2){const target=els.text.querySelector('.filled-page p'),end=Math.min(text.length,start+Math.max(length,1));if(target)target.innerHTML=`${escapeHtml(text.slice(0,start))}<mark>${escapeHtml(text.slice(start,end))}</mark>${escapeHtml(text.slice(end))}`;return}
     const page=pages[pageIndex]||'',local=Math.max(0,Math.min(page.length,start-offset)),wordEnd=Math.min(page.length,local+Math.max(length,1)),target=els.text.querySelector(`[data-page="${pageIndex}"]`);
     if(target)target.innerHTML=`${escapeHtml(page.slice(0,local))}<mark>${escapeHtml(page.slice(local,wordEnd))}</mark>${escapeHtml(page.slice(wordEnd))}`;
     return;
@@ -110,19 +111,27 @@ $('#updateAppBtn').onclick=async event=>{
   }
 };
 
-// Настільний розворот: короткий уривок продовжується на правій сторінці наступним уривком.
+// Настільний розворот заповнює обидві сторінки кількома послідовними уривками.
 const displayPageBase=displayPage,turnPageBase=turnPage;
 displayPage=function(direction=0){
-  displayPageBase(direction);pageState.borrowedNext=false;pageState.borrowedAdvance=1;
-  if(spreadSize()!==2||els.text.querySelectorAll('.book-page').length>1||state.current===null)return;
-  const nextText=state.chunks[state.index+1];if(!nextText)return;
-  const nextPages=paginate(nextText),right=document.createElement('p');
-  right.className='book-page borrowed-page';right.dataset.page='next';right.textContent=nextPages[0]||'';
-  els.text.append(right);pageState.borrowedNext=true;pageState.borrowedAdvance=nextPages.length===1?2:1;
+  if(spreadSize()!==2||state.current===null){displayPageBase(direction);return}
+  const probe=paginate('слово '.repeat(5000)),capacity=Math.max(700,probe[0]?.length||1200),leaves=[];let cursor=state.index;
+  for(let leaf=0;leaf<2;leaf++){
+    const parts=[];let used=0;
+    while(cursor<state.chunks.length){const part=state.chunks[cursor],cost=part.length+(parts.length?2:0);if(parts.length&&used+cost>capacity)break;parts.push(part);used+=cost;cursor++;if(used>=capacity*.9)break}
+    leaves.push(parts);
+  }
+  pageState.desktopAdvance=Math.max(1,cursor-state.index);pageState.desktopHistory=pageState.desktopHistory||[];
+  els.text.classList.add('two-page-spread');els.text.innerHTML=leaves.map((parts,index)=>`<div class="book-page filled-page" data-leaf="${index}">${parts.map(part=>`<p>${escapeHtml(part)}</p>`).join('')}</div>`).join('');
+  const b=state.books[state.current],chapter=[...(b.chapters||[])].reverse().find(x=>x.index<=state.index);els.meta.textContent=`${chapter?.title?chapter.title+' · ':''}${state.index+1}–${Math.min(state.chunks.length,cursor)}/${state.chunks.length}`;
+  els.text.classList.remove('turn-forward','turn-back');void els.text.offsetWidth;if(direction)els.text.classList.add(direction>0?'turn-forward':'turn-back');
 };
 turnPage=function(delta){
-  if(document.body.dataset.readerMode==='pages'&&spreadSize()===2&&pageState.borrowedNext&&delta>0){
-    stop();state.resumeOffset=0;state.books[state.current].offset=0;state.index=Math.min(state.chunks.length-1,state.index+pageState.borrowedAdvance);renderReader();displayPage(delta);return;
+  if(document.body.dataset.readerMode==='pages'&&spreadSize()===2){
+    stop();state.resumeOffset=0;state.books[state.current].offset=0;pageState.desktopHistory=pageState.desktopHistory||[];
+    if(delta>0){pageState.desktopHistory.push(state.index);state.index=Math.min(state.chunks.length-1,state.index+(pageState.desktopAdvance||1))}
+    else state.index=pageState.desktopHistory.length?pageState.desktopHistory.pop():Math.max(0,state.index-2);
+    renderReader();displayPage(delta);return;
   }
   turnPageBase(delta);
 };
