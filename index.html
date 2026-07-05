@@ -32,7 +32,7 @@
           <p>Додай першу книжку — вона залишиться лише на цьому пристрої.</p>
         </div>
         <div id="bookGrid" class="book-grid"></div>
-        <footer class="library-footer"><button id="supportProject" class="support-button" hidden>♡ Підтримати проєкт</button></footer>
+        <footer class="library-footer"><button id="installHelpHome" class="install-help-button">? Як встановити</button><button id="supportProject" class="support-button" hidden>♡ Підтримати проєкт</button></footer>
       </section>
     </section>
 
@@ -79,9 +79,22 @@
       <p class="hint">Іншомовний уривок спочатку перекладається, кешується на пристрої, а потім озвучується українським голосом.</p>
       <h3 class="settings-section-title">Дані</h3><div class="backup-actions"><button type="button" id="exportBackup">Експорт backup</button><label for="importBackup">Імпорт backup</label><input id="importBackup" type="file" accept="application/json,.json" hidden></div>
       <p class="hint">Backup містить усі книжки, прогрес, переклади, закладки, нотатки та налаштування.</p>
+      <button type="button" id="installHelpSettings" class="about-button">Як встановити застосунок</button>
       <button type="button" id="aboutAppBtn" class="about-button">Інформація про застосунок</button>
       <button class="primary-button full" value="close">Готово</button>
     </form>
+  </dialog>
+
+  <dialog id="installDialog">
+    <section class="settings-card install-card">
+      <div class="dialog-head"><h2>Як встановити «Слухай»</h2><button class="icon-button" id="closeInstallDialog" aria-label="Закрити">×</button></div>
+      <p class="hint">Після встановлення застосунок відкриватиметься окремо, як звичайна програма.</p>
+      <article class="install-step"><h3>iPhone або iPad</h3><ol><li>Відкрий «Слухай» у Safari.</li><li>Натисни «Поділитися» — квадрат зі стрілкою вгору.</li><li>Вибери «На початковий екран».</li><li>Натисни «Додати».</li></ol></article>
+      <article class="install-step"><h3>Android</h3><ol><li>Відкрий застосунок у Chrome.</li><li>Натисни меню ⋮.</li><li>Вибери «Установити застосунок» або «Додати на головний екран».</li><li>Підтвердь встановлення.</li></ol></article>
+      <article class="install-step"><h3>macOS</h3><ol><li>У Safari відкрий меню «Файл» → «Додати до Dock».</li><li>Або в Chrome натисни значок встановлення в адресному рядку та вибери «Установити».</li></ol></article>
+      <article class="install-step"><h3>Windows</h3><ol><li>Відкрий застосунок у Chrome або Edge.</li><li>Натисни значок встановлення праворуч в адресному рядку.</li><li>Підтвердь кнопкою «Установити».</li></ol></article>
+      <button class="primary-button full" id="closeInstallDialogBottom">Зрозуміло</button>
+    </section>
   </dialog>
 
   <dialog id="aboutDialog">
@@ -123,6 +136,6 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
   <script src="config.js?v=26"></script>
-  <script src="app.js?v=27" type="module"></script>
+  <script src="app.js?v=28" type="module"></script>
 </body>
 </html>

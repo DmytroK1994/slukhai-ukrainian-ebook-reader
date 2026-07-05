@@ -71,3 +71,12 @@ renderLibrary=function(){
 };
 $('#bookSearch')?.addEventListener('input',event=>{librarySearchQuery=event.target.value;renderLibrary()});
 renderLibrary();
+
+const installDialog=$('#installDialog'),isInstalledPwa=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+if(isInstalledPwa)$('#installHelpHome').hidden=true;
+function showInstallHelp(){dialog.close();installDialog.showModal()}
+$('#installHelpHome').onclick=showInstallHelp;
+$('#installHelpSettings').onclick=showInstallHelp;
+$('#closeInstallDialog').onclick=()=>installDialog.close();
+$('#closeInstallDialogBottom').onclick=()=>installDialog.close();
+window.addEventListener('appinstalled',()=>{$('#installHelpHome').hidden=true;installDialog.close();toast('«Слухай» установлено')});
