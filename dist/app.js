@@ -109,3 +109,26 @@ $('#updateAppBtn').onclick=async event=>{
     button.disabled=false;button.textContent=original;
   }
 };
+
+// Настільний розворот: короткий уривок продовжується на правій сторінці наступним уривком.
+const displayPageBase=displayPage,turnPageBase=turnPage;
+displayPage=function(direction=0){
+  displayPageBase(direction);pageState.borrowedNext=false;pageState.borrowedAdvance=1;
+  if(spreadSize()!==2||els.text.querySelectorAll('.book-page').length>1||state.current===null)return;
+  const nextText=state.chunks[state.index+1];if(!nextText)return;
+  const nextPages=paginate(nextText),right=document.createElement('p');
+  right.className='book-page borrowed-page';right.dataset.page='next';right.textContent=nextPages[0]||'';
+  els.text.append(right);pageState.borrowedNext=true;pageState.borrowedAdvance=nextPages.length===1?2:1;
+};
+turnPage=function(delta){
+  if(document.body.dataset.readerMode==='pages'&&spreadSize()===2&&pageState.borrowedNext&&delta>0){
+    stop();state.resumeOffset=0;state.books[state.current].offset=0;state.index=Math.min(state.chunks.length-1,state.index+pageState.borrowedAdvance);renderReader();displayPage(delta);return;
+  }
+  turnPageBase(delta);
+};
+document.addEventListener('keydown',event=>{
+  if(state.current===null||dialog.open||readerSettingsDialog.open||bookDialog.open||sleepDialog.open||installDialog.open)return;
+  if(event.target.closest('input,textarea,select,button'))return;
+  if(event.key==='ArrowRight'||event.key==='PageDown'){event.preventDefault();turnPage(1)}
+  if(event.key==='ArrowLeft'||event.key==='PageUp'){event.preventDefault();turnPage(-1)}
+});
