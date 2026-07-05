@@ -78,7 +78,8 @@
       <label>Власний LibreTranslate <small>(необов’язково)</small><input id="translateEndpoint" type="url" placeholder="Порожньо — автоматичний переклад" /></label>
       <p class="hint">Іншомовний уривок спочатку перекладається, кешується на пристрої, а потім озвучується українським голосом.</p>
       <h3 class="settings-section-title">Офлайн-переклад</h3>
-      <section class="language-pack"><div><strong>Англійська → Українська</strong><small id="offlinePackStatus">Пакет не завантажено · приблизно 120–180 МБ</small></div><button type="button" id="downloadOfflinePack">Завантажити</button></section>
+      <section class="language-pack"><div><strong>Англійська → Українська</strong><small id="offlinePackStatus">Пакет не завантажено · приблизно 120–180 МБ</small></div><span class="pack-actions"><button type="button" id="downloadOfflinePack">Завантажити</button><button type="button" id="deleteOfflinePack" class="delete-pack" hidden>Видалити</button></span></section>
+      <section class="language-pack"><div><strong>Російська → Українська</strong><small id="offlineRuPackStatus">Пакет не завантажено · приблизно 90–160 МБ</small></div><span class="pack-actions"><button type="button" id="downloadOfflineRuPack">Завантажити</button><button type="button" id="deleteOfflineRuPack" class="delete-pack" hidden>Видалити</button></span></section>
       <label class="toggle-row"><span><strong>Використовувати офлайн-пакет</strong><small>Текст не надсилається в інтернет</small></span><input id="offlineTranslateToggle" type="checkbox" role="switch" /></label>
       <h3 class="settings-section-title">Дані</h3><div class="backup-actions"><button type="button" id="exportBackup">Експорт backup</button><label for="importBackup">Імпорт backup</label><input id="importBackup" type="file" accept="application/json,.json" hidden></div>
       <p class="hint">Backup містить усі книжки, прогрес, переклади, закладки, нотатки та налаштування.</p>
@@ -143,6 +144,6 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
   <script src="config.js?v=26"></script>
-  <script src="app.js?v=39" type="module"></script>
+  <script src="app.js?v=41" type="module"></script>
 </body>
 </html>
