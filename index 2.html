@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f1e7" />
+  <meta name="description" content="Українська PWA-читалка з озвученням EPUB, PDF і TXT" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="updates.css" />
+  <title>Слухай — українська читалка</title>
+</head>
+<body>
+  <div id="appSplash" class="app-splash"><span class="brand-mark">С</span><strong>Слухай</strong></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="На головну"><span class="brand-mark">С</span><span>Слухай</span></a>
+    <button class="icon-button" id="settingsBtn" aria-label="Налаштування">⚙</button>
+  </header>
+
+  <main>
+    <section id="libraryView" class="view active">
+      <section class="library-section">
+        <div class="section-title"><h2>Моя бібліотека</h2><div class="library-actions"><span id="bookCount">0 книжок</span><label class="add-book-button" for="bookInput">＋ Додати</label></div></div>
+        <div class="category-bar"><button class="category-chip active" data-category="all">Усі</button><div id="categoryChips"></div></div>
+        <input id="bookInput" type="file" multiple accept=".epub,.pdf,.txt,text/plain,application/pdf,application/epub+zip" hidden />
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">⌁</div>
+          <h3>Тут поки тихо</h3>
+          <p>Додай першу книжку — вона залишиться лише на цьому пристрої.</p>
+        </div>
+        <div id="bookGrid" class="book-grid"></div>
+        <footer class="library-footer"><button id="supportProject" class="support-button" hidden>♡ Підтримати проєкт</button></footer>
+      </section>
+    </section>
+
+    <section id="readerView" class="view reader-view">
+      <nav class="reader-nav">
+        <button class="icon-button" id="backBtn" aria-label="Назад">←</button>
+        <div><strong id="readerTitle">Книжка</strong><small id="readerMeta">Розділ</small></div>
+        <div class="reader-actions"><button class="icon-button" id="contentsBtn" aria-label="Зміст">☰</button><button class="icon-button" id="bookmarkBtn" aria-label="Закладка">☆</button><button class="icon-button" id="readerSettingsBtn" aria-label="Вигляд тексту">Aa</button></div>
+      </nav>
+      <article id="readerText" class="reader-text" tabindex="0"></article>
+      <div class="player">
+        <div class="progress-row"><span id="elapsed" title="Прослухано">0:00</span><input id="progress" type="range" min="0" max="100" value="0" aria-label="Прогрес" /><span id="remaining" title="Залишилося">−0:00</span><span id="percent">0%</span></div>
+        <div class="player-controls">
+          <button id="prevBtn" aria-label="Попередній уривок">−</button>
+          <button id="playBtn" class="play-button" aria-label="Відтворити">▶</button>
+          <button id="nextBtn" aria-label="Наступний уривок">＋</button>
+          <button id="speedBtn" class="speed-button" aria-label="Швидкість">1×</button>
+          <button id="sleepBtn" class="sleep-button" aria-label="Таймер сну">☾</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="settingsDialog">
+    <form method="dialog" class="settings-card">
+      <div class="dialog-head"><h2>Налаштування</h2><button class="icon-button" value="close" aria-label="Закрити">×</button></div>
+      <h3 class="settings-section-title">Озвучення</h3>
+      <label>Мова озвучення<select id="speechLanguage">
+        <option value="uk-UA">Українська</option>
+        <option value="en-US">English</option>
+        <option value="de-DE">Deutsch</option>
+        <option value="fr-FR">Français</option>
+        <option value="es-ES">Español</option>
+        <option value="pl-PL">Polski</option>
+        <option value="it-IT">Italiano</option>
+        <option value="cs-CZ">Čeština</option>
+      </select></label>
+      <label>Голос<select id="voiceSelect"></select><small id="voiceHint">Показано голоси вибраної мови, доступні на пристрої</small></label>
+      <label>Тон голосу<input id="voicePitch" type="range" min="0.75" max="1.25" step="0.05" value="1" /></label>
+      <h3 class="settings-section-title">Вимова</h3><label>Словник вимови<textarea id="pronunciation" rows="4" placeholder="Hermione = Гермайона&#10;Hogwarts = Гоґвортс"></textarea><small>Одна заміна на рядок у форматі «слово = вимова»</small></label>
+      <h3 class="settings-section-title">Переклад</h3>
+      <label class="toggle-row"><span><strong>Автопереклад українською</strong><small>Перед кожним озвученим уривком</small></span><input id="translateToggle" type="checkbox" role="switch" checked /></label>
+      <label>Власний LibreTranslate <small>(необов’язково)</small><input id="translateEndpoint" type="url" placeholder="Порожньо — автоматичний переклад" /></label>
+      <p class="hint">Іншомовний уривок спочатку перекладається, кешується на пристрої, а потім озвучується українським голосом.</p>
+      <h3 class="settings-section-title">Дані</h3><div class="backup-actions"><button type="button" id="exportBackup">Експорт backup</button><label for="importBackup">Імпорт backup</label><input id="importBackup" type="file" accept="application/json,.json" hidden></div>
+      <p class="hint">Backup містить усі книжки, прогрес, переклади, закладки, нотатки та налаштування.</p>
+      <button type="button" id="aboutAppBtn" class="about-button">Інформація про застосунок</button>
+      <button class="primary-button full" value="close">Готово</button>
+    </form>
+  </dialog>
+
+  <dialog id="aboutDialog">
+    <section class="settings-card about-card">
+      <div class="dialog-head"><h2>Про застосунок</h2><button class="icon-button" id="closeAboutDialog" aria-label="Закрити">×</button></div>
+      <div class="about-hero"><span class="brand-mark">С</span><p class="eyebrow">Твоя бібліотека</p><h1>Книжки, які<br><em>говорять українською</em></h1><p>Додавай EPUB, PDF або TXT. Читай очима чи слухай у зручному темпі.</p></div>
+      <div class="about-features"><span>EPUB · PDF · TXT</span><span>Українське озвучення</span><span>Переклад</span><span>Офлайн-бібліотека</span></div>
+      <p class="hint">«Слухай» — приватна читалка: книжки та прогрес залишаються на твоєму пристрої.</p>
+      <button id="supportFromAbout" class="primary-button full" hidden>♡ Підтримати проєкт</button>
+    </section>
+  </dialog>
+
+  <dialog id="readerSettingsDialog">
+    <form method="dialog" class="settings-card">
+      <div class="dialog-head"><h2>Вигляд книги</h2><button class="icon-button" value="close" aria-label="Закрити">×</button></div>
+      <label>Розмір тексту <strong id="fontSizeValue">21 px</strong><input id="fontSize" type="range" min="16" max="32" value="21" /></label>
+      <label>Шрифт<select id="fontFamily"><option value="serif">Книжковий</option><option value="system">Системний</option><option value="dyslexic">Для легшого читання</option></select></label>
+      <label>Тема<select id="readerTheme"><option value="paper">Паперова</option><option value="light">Світла</option><option value="dark">Темна</option><option value="sepia">Сепія</option></select></label>
+      <label>Режим читання<select id="readerMode"><option value="pages">Сторінки</option><option value="scroll">Прокручування</option></select></label>
+      <label>Анімація сторінки<select id="pageAnimation"><option value="slide">Зсув</option><option value="fade">Згасання</option><option value="flip">Перегортання</option><option value="none">Без анімації</option></select></label>
+      <label class="toggle-row"><span><strong>Показувати переклад</strong><small>Читати книгу мовою озвучення</small></span><input id="showTranslation" type="checkbox" role="switch" /></label>
+      <button class="primary-button full" value="close">Готово</button>
+    </form>
+  </dialog>
+
+  <dialog id="bookDialog">
+    <section class="settings-card book-tools">
+      <div class="dialog-head"><h2>Книга</h2><button class="icon-button" id="closeBookDialog" aria-label="Закрити">×</button></div>
+      <div class="tool-tabs"><button id="tocTab" class="active">Зміст</button><button id="bookmarksTab">Закладки</button><button id="notesTab">Нотатки</button></div>
+      <div id="toolContent" class="tool-content"></div>
+    </section>
+  </dialog>
+
+  <dialog id="sleepDialog">
+    <section class="settings-card"><div class="dialog-head"><h2>Таймер сну</h2><button class="icon-button" id="closeSleepDialog">×</button></div><div class="sleep-options"><button data-minutes="10">10 хв</button><button data-minutes="20">20 хв</button><button data-minutes="30">30 хв</button><button data-minutes="60">1 година</button><button data-minutes="0">Вимкнути</button></div><div class="custom-sleep"><input id="customSleepMinutes" type="number" min="1" max="720" inputmode="numeric" placeholder="Свій час, хв"><button id="setCustomSleep">Увімкнути</button></div><p id="sleepStatus" class="hint">Таймер вимкнено</p></section>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+  <script src="config.js"></script>
+  <script src="app.js?v=24" type="module"></script>
+</body>
+</html>
