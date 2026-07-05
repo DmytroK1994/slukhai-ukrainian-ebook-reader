@@ -145,3 +145,16 @@ document.addEventListener('keydown',event=>{
 });
 
 async function translateVisibleSpread(parts,book,target){book.translations=book.translations||{};for(const part of parts){const key=`${part.index}:${target}`;try{if(!book.translations[key])book.translations[key]=await googleTranslate(part.text,target);const node=els.text.querySelector(`[data-chunk="${part.index}"]`);if(node&&part.index!==state.index)node.textContent=book.translations[key]}catch(error){console.warn('Не вдалося перекласти видимий уривок',error)}}save()}
+
+const OFFLINE_MODEL='Xenova/opus-mt-en-uk';let offlineTranslator=null,offlineLoading=null;
+const offlineStatus=$('#offlinePackStatus'),offlineButton=$('#downloadOfflinePack'),offlineToggle=$('#offlineTranslateToggle');
+offlineToggle.checked=localStorage.getItem('offlineTranslate')==='true';
+function updateOfflinePackUi(){const ready=localStorage.getItem('offlineEnUkReady')==='true';offlineStatus.textContent=ready?'Завантажено · готовий до роботи без інтернету':'Пакет не завантажено · приблизно 120–180 МБ';offlineButton.textContent=ready?'Перевірити пакет':'Завантажити'}
+updateOfflinePackUi();offlineToggle.onchange=e=>localStorage.setItem('offlineTranslate',e.target.checked);
+async function loadOfflineTranslator(showProgress=false){
+  if(offlineTranslator)return offlineTranslator;if(offlineLoading)return offlineLoading;
+  offlineLoading=(async()=>{offlineButton.disabled=true;offlineStatus.classList.add('offline-progress');try{const {pipeline,env}=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1');env.useBrowserCache=true;offlineTranslator=await pipeline('translation',OFFLINE_MODEL,{dtype:'q8',progress_callback:data=>{if(!showProgress||typeof data.progress!=='number')return;const progress=Math.max(0,Math.min(100,Math.round(data.progress)));offlineStatus.style.setProperty('--download-progress',progress+'%');offlineStatus.textContent=`Завантаження мовного пакета: ${progress}%`}});localStorage.setItem('offlineEnUkReady','true');offlineToggle.checked=true;localStorage.setItem('offlineTranslate','true');offlineStatus.classList.remove('offline-progress');offlineStatus.style.removeProperty('--download-progress');updateOfflinePackUi();return offlineTranslator}catch(error){offlineStatus.classList.remove('offline-progress');offlineStatus.textContent=navigator.onLine?'Не вдалося завантажити пакет. Спробуй ще раз.':'Для першого завантаження потрібен інтернет.';throw error}finally{offlineButton.disabled=false;offlineLoading=null}})();return offlineLoading
+}
+offlineButton.onclick=async()=>{try{await loadOfflineTranslator(true);toast('Офлайн-пакет готовий')}catch(error){console.error(error);toast('Не вдалося завантажити мовний пакет')}};
+const onlineGoogleTranslate=googleTranslate;
+googleTranslate=async function(text,target){if(offlineToggle.checked&&target==='uk'){if(localStorage.getItem('offlineEnUkReady')!=='true'&&!navigator.onLine)throw Error('offline_pack_missing');const translator=await loadOfflineTranslator(false),parts=text.match(/[\s\S]{1,420}(?:\s|$)/g)||[text],translatedParts=[];for(const part of parts){const result=await translator(part,{max_new_tokens:512});translatedParts.push(result?.[0]?.translation_text||'')}return translatedParts.join(' ')}return onlineGoogleTranslate(text,target)};
