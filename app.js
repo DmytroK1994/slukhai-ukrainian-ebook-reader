@@ -123,7 +123,8 @@ displayPage=function(direction=0){
   }
   pageState.desktopStart=spreadStart;pageState.desktopEnd=cursor;pageState.desktopAdvance=Math.max(1,cursor-spreadStart);pageState.desktopHistory=pageState.desktopHistory||[];
   const b=state.books[state.current],targetLanguage=$('#speechLanguage').value.split('-')[0],allParts=leaves.flat();els.text.classList.add('two-page-spread');els.text.innerHTML=`<div class="spread-flow">${allParts.map(part=>{const shown=$('#showTranslation')?.checked?(b.translations?.[`${part.index}:${targetLanguage}`]||part.text):part.text;return`<p data-chunk="${part.index}">${escapeHtml(shown)}</p>`}).join('')}</div>`;
-  if($('#translateToggle').checked)translateVisibleSpread(leaves.flat(),b,targetLanguage);
+  // Переклад виконується послідовно під час озвучення. Масовий переклад усього
+  // розвороту перевантажує локальну модель на комп'ютерах і мобільних пристроях.
   const chapter=[...(b.chapters||[])].reverse().find(x=>x.index<=state.index);els.meta.textContent=`${chapter?.title?chapter.title+' · ':''}${spreadStart+1}–${Math.min(state.chunks.length,cursor)}/${state.chunks.length}`;
   els.text.classList.remove('turn-forward','turn-back');void els.text.offsetWidth;if(direction)els.text.classList.add(direction>0?'turn-forward':'turn-back');
 };
