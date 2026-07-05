@@ -80,3 +80,20 @@ $('#installHelpSettings').onclick=showInstallHelp;
 $('#closeInstallDialog').onclick=()=>installDialog.close();
 $('#closeInstallDialogBottom').onclick=()=>installDialog.close();
 window.addEventListener('appinstalled',()=>{$('#installHelpHome').hidden=true;installDialog.close();toast('«Слухай» установлено')});
+
+$('#updateAppBtn').onclick=async event=>{
+  const button=event.currentTarget,original=button.textContent;
+  button.disabled=true;button.textContent='Оновлюю…';
+  try{
+    await persistLibrary();
+    if(!navigator.onLine)throw Error('offline');
+    const registrations='serviceWorker'in navigator?await navigator.serviceWorker.getRegistrations():[];
+    await Promise.all(registrations.map(registration=>registration.unregister()));
+    if('caches'in window)await Promise.all((await caches.keys()).filter(name=>name.startsWith('slukhai-')).map(name=>caches.delete(name)));
+    const url=new URL(location.href);url.searchParams.set('update',Date.now());url.hash='';
+    location.replace(url.href);
+  }catch(error){
+    console.error(error);toast('Не вдалося оновити. Перевір інтернет і повтори.');
+    button.disabled=false;button.textContent=original;
+  }
+};
