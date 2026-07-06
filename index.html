@@ -40,7 +40,7 @@
       <nav class="reader-nav">
         <button class="icon-button" id="backBtn" aria-label="Назад">←</button>
         <div><strong id="readerTitle">Книжка</strong><small id="readerMeta">Розділ</small></div>
-        <div class="reader-actions"><button class="icon-button" id="contentsBtn" aria-label="Зміст">☰</button><button class="icon-button" id="bookmarkBtn" aria-label="Закладка">☆</button><button class="icon-button" id="readerSettingsBtn" aria-label="Вигляд тексту">Aa</button></div>
+        <div class="reader-actions"><button class="icon-button" id="contentsBtn" aria-label="Зміст">☰</button><button class="icon-button" id="bookmarkBtn" aria-label="Закладка">☆</button><button class="icon-button pronunciation-fix-button" id="quickPronunciationBtn" aria-label="Виправити вимову" title="Виправити вимову">А́</button><button class="icon-button" id="readerSettingsBtn" aria-label="Вигляд тексту">Aa</button></div>
       </nav>
       <article id="readerText" class="reader-text" tabindex="0"></article>
       <div class="player">
@@ -72,7 +72,7 @@
       </select></label>
       <label>Голос<select id="voiceSelect"></select><small id="voiceHint">Показано голоси вибраної мови, доступні на пристрої</small></label>
       <label>Тон голосу<input id="voicePitch" type="range" min="0.75" max="1.25" step="0.05" value="1" /></label>
-      <h3 class="settings-section-title">Вимова</h3><label>Словник вимови<textarea id="pronunciation" rows="4" placeholder="Hermione = Гермайона&#10;Hogwarts = Гоґвортс"></textarea><small>Одна заміна на рядок у форматі «слово = вимова»</small></label>
+      <h3 class="settings-section-title">Словник вимови</h3><div id="pronunciationDictionary" class="pronunciation-dictionary"></div><button type="button" id="addPronunciationRule" class="dictionary-add">＋ Додати виправлення</button><details class="legacy-pronunciation"><summary>Старі правила</summary><label>Правила у форматі «слово = вимова»<textarea id="pronunciation" rows="3" placeholder="Hermione = Гермайона&#10;Hogwarts = Гоґвортс"></textarea></label></details>
       <h3 class="settings-section-title">Переклад</h3>
       <label class="toggle-row"><span><strong>Автопереклад українською</strong><small>Перед кожним озвученим уривком</small></span><input id="translateToggle" type="checkbox" role="switch" checked /></label>
       <label>Власний LibreTranslate <small>(необов’язково)</small><input id="translateEndpoint" type="url" placeholder="Порожньо — автоматичний переклад" /></label>
@@ -89,6 +89,17 @@
       <button type="button" id="installHelpSettings" class="about-button">Як встановити застосунок</button>
       <button type="button" id="aboutAppBtn" class="about-button">Інформація про застосунок</button>
       <button class="primary-button full" value="close">Готово</button>
+    </form>
+  </dialog>
+
+  <dialog id="pronunciationDialog">
+    <form method="dialog" class="settings-card pronunciation-card" id="pronunciationForm">
+      <div class="dialog-head"><h2>Виправити вимову</h2><button type="button" class="icon-button" id="closePronunciationDialog" aria-label="Закрити">×</button></div>
+      <input id="pronunciationEditId" type="hidden">
+      <label>Слово<input id="pronunciationWord" type="text" autocomplete="off" placeholder="Наприклад: каталог" required></label>
+      <label>Правильна вимова або наголос<input id="pronunciationValue" type="text" autocomplete="off" placeholder="Наприклад: ката́лог" required><small>Наголос можна позначити символом ´ після потрібної літери або записати слово так, як його має вимовляти голос.</small></label>
+      <label class="toggle-row"><span><strong>Лише для цієї книги</strong><small id="pronunciationBookHint">Правило діятиме тільки в поточній книзі</small></span><input id="pronunciationBookOnly" type="checkbox" role="switch"></label>
+      <button type="submit" class="primary-button full" id="savePronunciationRule">Зберегти виправлення</button>
     </form>
   </dialog>
 
@@ -144,6 +155,6 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
   <script src="config.js?v=26"></script>
-  <script src="app.js?v=41" type="module"></script>
+  <script src="app.js?v=43" type="module"></script>
 </body>
 </html>
