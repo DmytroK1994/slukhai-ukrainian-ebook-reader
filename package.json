@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "node scripts/patch-ios-background-tts.mjs",
-    "prepare:web": "mkdir -p dist && cp index.html styles.css updates.css app.js config.js build-version.json manifest.webmanifest icon.svg sw.js sw-v2.js .nojekyll dist/",
+    "prepare:web": "mkdir -p dist/vendor/epubjs && cp index.html styles.css updates.css app.js config.js build-version.json manifest.webmanifest icon.svg sw.js sw-v2.js .nojekyll dist/ && cp vendor/epubjs/epub.min.js dist/vendor/epubjs/",
     "native:sync": "npm run prepare:web && npx cap sync",
     "android": "npm run native:sync && npx cap open android",
     "ios": "npm run native:sync && npx cap open ios"
