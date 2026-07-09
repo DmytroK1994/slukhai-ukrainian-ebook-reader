@@ -6,14 +6,34 @@
   <meta name="theme-color" content="#f6f1e7" />
   <meta name="description" content="Українська PWA-читалка з озвученням EPUB, PDF і TXT" />
   <meta name="slukhai-version" content="0.3.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=52" />
-  <link rel="icon" href="icon.svg?v=52" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css?v=52" />
-  <link rel="stylesheet" href="updates.css?v=52" />
+  <link rel="manifest" href="manifest.webmanifest?v=56" />
+  <link rel="icon" href="icon.svg?v=56" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css?v=56" />
+  <link rel="stylesheet" href="updates.css?v=56" />
   <title>Слухай — українська читалка</title>
 </head>
 <body>
-  <div id="appSplash" class="app-splash"><span class="brand-mark">С</span><strong>Слухай</strong></div>
+  <div id="appSplash" class="app-splash" aria-label="Запуск застосунку Слухай">
+    <div class="splash-book-scene" aria-hidden="true">
+      <div class="splash-book">
+        <span class="splash-book-cover"></span>
+        <span class="splash-book-page splash-book-page-left"></span>
+        <span class="splash-book-page splash-book-page-right"></span>
+        <span class="splash-book-spine"></span>
+      </div>
+      <div class="splash-book-waves">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <div class="splash-book-brand">
+      <span class="brand-mark">С</span>
+      <strong>Слухай</strong>
+    </div>
+    <p>Книжки, які говорять українською</p>
+    <div class="splash-reader-line" aria-hidden="true"><span>Читайте очима · слухайте голосом · перекладайте українською</span></div>
+  </div>
   <header class="topbar">
     <a class="brand" href="#" aria-label="На головну"><span class="brand-mark">С</span><span>Слухай</span></a>
     <button class="icon-button" id="settingsBtn" aria-label="Налаштування">⚙</button>
@@ -118,7 +138,7 @@
   <dialog id="aboutDialog">
     <section class="settings-card about-card">
       <div class="dialog-head"><h2>Про застосунок</h2><button class="icon-button" id="closeAboutDialog" aria-label="Закрити">×</button></div>
-      <dl class="build-information build-information-top"><div><dt>Версія</dt><dd id="appVersion">2026.07.07 · 00:05</dd></div><div><dt>Останнє оновлення</dt><dd id="appUpdatedAt">7 липня 2026, 00:05</dd></div></dl>
+      <dl class="build-information build-information-top"><div><dt>Версія</dt><dd id="appVersion">2026.07.10 · 00:47</dd></div><div><dt>Останнє оновлення</dt><dd id="appUpdatedAt">10 липня 2026, 00:47</dd></div></dl>
       <div class="about-hero"><span class="brand-mark">С</span><p class="eyebrow">Твоя бібліотека</p><h1>Книжки, які<br><em>говорять українською</em></h1><p>Додавай EPUB, PDF або TXT. Читай очима чи слухай у зручному темпі.</p></div>
       <div class="about-features"><span>EPUB · PDF · TXT</span><span>Українське озвучення</span><span>Переклад</span><span>Офлайн-бібліотека</span></div>
       <p class="hint">«Слухай» — приватна читалка: книжки та прогрес залишаються на твоєму пристрої.</p>
@@ -162,7 +182,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="vendor/epubjs/epub.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
-  <script src="config.js?v=52"></script>
-  <script src="app.js?v=52" type="module"></script>
+  <script src="config.js?v=56"></script>
+  <script src="app.js?v=56" type="module"></script>
 </body>
 </html>
