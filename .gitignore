@@ -2,7 +2,10 @@ node_modules/
 dist/
 .gems/
 .tools/
-vendor/
+vendor/*
+!vendor/epubjs/
+vendor/epubjs/*
+!vendor/epubjs/epub.min.js
 .DS_Store
 android/.gradle/
 android/local.properties
